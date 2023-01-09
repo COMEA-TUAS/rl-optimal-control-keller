@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --job-name=rl-optimal-control
-#SBATCH --account=Project_2004564
+#SBATCH --job-name=optimalcontrol
+#SBATCH --account=Project_2007094
 #SBATCH --partition=longrun
 #SBATCH --time=14-00:00:00
 #SBATCH --ntasks=1

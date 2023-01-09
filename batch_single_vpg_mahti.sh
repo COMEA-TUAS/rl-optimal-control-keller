@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --job-name=rl-optimal-control
-#SBATCH --account=Project_2005209
+#SBATCH --job-name=optimalcontrol
+#SBATCH --account=Project_2007094
 #SBATCH --partition=medium
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
