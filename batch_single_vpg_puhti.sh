@@ -17,7 +17,7 @@ if [ $# -ne 8 ]; then
   exit 1;
 fi
 
-base_logdir="/scratch/project_2004564/velcontrol-rl-keller/runvpg/"
+base_logdir="/scratch/project_2007094/velcontrol-rl-keller/runvpg/"
 
 
 exp_num=$1
