@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
-module load pytorch/1.10 gcc/9.3.0 openmpi/4.0.3
+module load pytorch/1.11 gcc/9.4.0 openmpi/4.1.2
 
 # SAMPLE COMMAND sbatch batch_single_vpg.sh 71.0puh paper-L1500-muOffset1-rwd-log-Xbarrier-derivative-dt0.1-batchsize10k-1x32-lr0.001-60k-1mu-minus0.5logstd "32" 0.001 60000 "-0.5" 1500 10000
 
