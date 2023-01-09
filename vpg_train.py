@@ -52,7 +52,6 @@ if __name__ == '__main__':
     parser.add_argument('--delta-time', type=float, default=0.1)
     parser.add_argument('--seed', '-s', type=int, default=0)
     parser.add_argument('--gamma', type=float, default=0.99)
-    parser.add_argument('--gaussian-log-std', type=float, default=-0.5)
     parser.add_argument('--cpu', type=int, default=1)
     args = parser.parse_args()
     print(" ".join(sys.argv))
@@ -66,6 +65,6 @@ if __name__ == '__main__':
     logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed, data_dir=args.log_dir)
 
     vpg(lambda : get_env(args), actor_critic=core.MLPActorCritic,
-        ac_kwargs=dict(hidden_sizes=[int(x) for x in args.hidden_sizes.split(",")], activation=nn.Tanh, gaussian_log_std=args.gaussian_log_std), 
+        ac_kwargs=dict(hidden_sizes=[int(x) for x in args.hidden_sizes.split(",")], activation=nn.Tanh), 
         gamma=args.gamma, seed=args.seed, steps_per_epoch=args.batch_size, epochs=args.epochs, max_ep_len=args.batch_size,
         pi_lr=args.lr, logger_kwargs=logger_kwargs)
