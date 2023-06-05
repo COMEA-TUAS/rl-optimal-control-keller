@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem-per-cpu=2G
 
-module load pytorch/nvidia-19.11-py3 gcc/9.1.0 intel-mpi/18.0.5
+module load pytorch/1.13 gcc/9.4.0 openmpi/4.1.4
 
 if [ $# -ne 9 ]; then
   echo "batch_single_vpg.sh <experiment-number> <experiment-info> <hidden-sizes> \
