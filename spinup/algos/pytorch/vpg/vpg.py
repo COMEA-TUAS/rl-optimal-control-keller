@@ -88,7 +88,8 @@ class VPGBuffer:
 def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0, 
         steps_per_epoch=4000, epochs=50, gamma=0.99, pi_lr=3e-4,
         vf_lr=1e-3, train_v_iters=80, lam=0.97, max_ep_len=1000,
-        logger_kwargs=dict(), save_freq=10):
+        logger_kwargs=dict(), save_freq=10, 
+        adaptive_learn_window=500, adaptive_learn_nof_skips=50):
     """
     Vanilla Policy Gradient 
 
@@ -268,6 +269,8 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
     start_time = time.time()
     o, ep_ret, ep_len = env.reset(), 0, 0
 
+    adaptive_learn_rets = []
+
     # Main loop: collect experience in env and update/log each epoch
     for epoch in range(epochs):
         for t in range(local_steps_per_epoch):
@@ -300,6 +303,12 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
                 if terminal:
                     # only save EpRet / EpLen if trajectory finished
                     logger.store(EpRet=ep_ret, EpLen=ep_len)
+                
+                # adaptive_learn_rets.append(ep_ret)
+                # if len(adaptive_learn_rets) > adaptive_learn_window:
+                #    del adaptive_learn_rets[:(len(adaptive_learn_rets)-adaptive_learn_window+1)]
+                # if sum(adaptive_learn_rets)/len(adaptive_learn_rets)
+
                 o, ep_ret, ep_len = env.reset(), 0, 0
 
 

@@ -10,6 +10,7 @@ import argparse
 
 import spinup.algos.pytorch.vpg.core as core
 from spinup.algos.pytorch.vpg.vpg import vpg
+from spinup.utils.mpi_tools import mpi_fork
   
 def load_env(log_dir):
     file_path = os.path.join(log_dir, "last_env.pckl.obj")
@@ -52,14 +53,14 @@ if __name__ == '__main__':
     parser.add_argument('--delta-time', type=float, default=0.1)
     parser.add_argument('--seed', '-s', type=int, default=0)
     parser.add_argument('--gamma', type=float, default=0.99)
-    parser.add_argument('--cpu', type=int, default=1)
+    parser.add_argument('--cpu', type=int, default=8)
     args = parser.parse_args()
     print(" ".join(sys.argv))
     print(args)
     print('\nUsing reward-to-go formulation of policy gradient.\n')
 
 
-    # mpi_fork(args.cpu)  # run parallel code with mpi
+    mpi_fork(args.cpu)  # run parallel code with mpi
 
     from spinup.utils.run_utils import setup_logger_kwargs
     logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed, data_dir=args.log_dir)
