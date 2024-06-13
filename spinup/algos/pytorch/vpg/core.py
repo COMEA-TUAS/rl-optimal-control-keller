@@ -79,15 +79,25 @@ class MLPCategoricalActor(Actor):
 
 class MLPGaussianActor(Actor):
 
-    def __init__(self, obs_dim, act_dim, hidden_sizes, activation, gaussian_log_std):
+    def __init__(self, obs_dim, act_dim, hidden_sizes, activation):
         super().__init__()
-        log_std = gaussian_log_std * np.ones(act_dim, dtype=np.float32)
-        self.log_std = torch.nn.Parameter(torch.as_tensor(log_std))
-        self.mu_net = mlp([obs_dim] + list(hidden_sizes) + [act_dim], activation)
+        # log_std = -0.5 * np.ones(act_dim, dtype=np.float32)
+        # self.log_std = torch.nn.Parameter(torch.as_tensor(log_std))
+        
+        self.act_dim = act_dim
+        self.net = mlp([obs_dim] + list(hidden_sizes) + [act_dim*2], activation)
 
     def _distribution(self, obs):
-        mu = self.mu_net(obs) + 1
-        std = torch.exp(self.log_std)
+        out = self.net(obs)
+        # print("out:", out.size(), len(out.size()))
+        if len(out.size()) == 1:
+            mu = out[:self.act_dim]
+            log_std = out[self.act_dim:]
+        else: 
+            mu, log_std = torch.hsplit(out, 2)
+            # log_std = out[:][self.act_dim:]
+        # print("mu:", mu.size())
+        std = torch.exp(log_std)
         return Normal(mu, std)
 
     def _log_prob_from_distribution(self, pi, act):
@@ -109,14 +119,14 @@ class MLPActorCritic(nn.Module):
 
 
     def __init__(self, observation_space, action_space, 
-                 hidden_sizes=(64,64), activation=nn.Tanh, gaussian_log_std=-0.5):
+                 hidden_sizes=(64,64), activation=nn.Tanh):
         super().__init__()
 
         obs_dim = observation_space.shape[0]
 
         # policy builder depends on action space
         if isinstance(action_space, Box):
-            self.pi = MLPGaussianActor(obs_dim, action_space.shape[0], hidden_sizes, activation, gaussian_log_std)
+            self.pi = MLPGaussianActor(obs_dim, action_space.shape[0], hidden_sizes, activation)
         elif isinstance(action_space, Discrete):
             self.pi = MLPCategoricalActor(obs_dim, action_space.n, hidden_sizes, activation)
 

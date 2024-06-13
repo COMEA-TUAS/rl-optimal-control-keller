@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 4 ]; then
   echo "fetch_results.sh <puhti|mahti> <num-last-csv-logs> <experiment-dir>"
-  echo " e.g fetch_results.sh puhti 40 exp-20-rwd-z.invtime-2x32-lr0.001-30k-10mu-minus0.5logstd"
+  echo " e.g fetch_results.sh puhti 40 1 exp-20-rwd-z.invtime-2x32-lr0.001-30k-10mu-minus0.5logstd"
   exit 1;
 fi
 
@@ -11,7 +11,8 @@ base_logdir="/scratch/project_*/velcontrol-rl-keller/runvpg/"
 
 server=$1
 num_last_csv_logs=$2
-exp_dir=$3
+num_last_models=$3
+exp_dir=$4
 
 mkdir -p $exp_dir $exp_dir/csv $exp_dir/${exp_dir}_s0
 
@@ -32,3 +33,14 @@ ssh $server "ls /${base_logdir}/$exp_dir/csv | sort -t "_" -k 2 -n -r | head -n 
 		fi 
 	done;
 python turn_csv_to_fig.py --plot-kellers --plot-kellers-track-length $track_length --num-last-files $num_last_csv_logs $exp_dir
+
+
+ssh $server "ls /${base_logdir}/$exp_dir/${exp_dir}_s0/pyt_save | sed 's/model//g' | sed 's/.pt//g' | sort -n -r | head -n $num_last_models" | \
+	while read line; do
+		file="/${base_logdir}/$exp_dir/${exp_dir}_s0/pyt_save/model${line}.pt"
+		if [ ! -f $file ]; then
+			scp $server:$file $exp_dir/${exp_dir}_s0/pyt_save/;
+		fi 
+	done;
+
+./run_all_models.sh $exp_dir/${exp_dir}_s0/pyt_save/ $track_length

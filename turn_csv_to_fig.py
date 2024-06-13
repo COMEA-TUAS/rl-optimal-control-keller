@@ -217,12 +217,17 @@ def turn_csv_to_fig(log_dir, num_last_files=10, go_back_percentage=0.0,
                     info = "    ".join(lines)
                 info = info.replace("\n", " ")
                 
-                df = pd.read_csv (csv_file)
-                # print(df)
+                df = pd.read_csv(csv_file, index_col=False)[1:]
+                # print(df.keys())
+                # print(df.head())
                 
                 
-                keys = [["x", "velocity", "E"], 
-                    ["propulsion_force", "acceleration", "reward"]]
+                if "stddev" in df.keys():
+                    keys = [["x", "velocity", "E"], 
+                        ["propulsion_force", "stddev", "reward"]]
+                else:
+                    keys = [["x", "velocity", "E"], 
+                        ["propulsion_force", "acceleration", "reward"]]
                 y_limits_array = None
                 if y_limits is not None:
                     y_limits_array = []
@@ -243,10 +248,17 @@ def turn_csv_to_fig(log_dir, num_last_files=10, go_back_percentage=0.0,
                             mtp_axs[i][j].set_ylim(y_limits_array[j*3+i])
                         if time_limit is not None:
                             mtp_axs[i][j].set_xlim([-1, time_limit])
+                        if k == "propulsion_force" and "stddev" in df.keys():
+                            print(f"adding stddev on plot : {df['stddev'].mean()}")
+                            print(df.head())
+                            mtp_axs[i][j].fill_between(df["time"], df["propulsion_force"] - df["stddev"]*3, 
+                                        df["propulsion_force"] + df["stddev"]*3, color="red", alpha=0.2)
                 # plot_stepized_column(-1, 1, mtp_axs, df, "propulsion_force")
                 # plot_stepized_column(-2, 1, mtp_axs, df, "acceleration")
                 
                 # mtp_axs[0].set_title(info, color=('green' if "Success" in info else 'red'))        
+                
+                
                 fig.suptitle("info:" + info, color=('green' if "Success" in info else 'red'))        
 
                 plt.subplots_adjust(left, bottom, right, top, wspace, hspace)
